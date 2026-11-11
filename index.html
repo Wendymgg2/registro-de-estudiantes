@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registro de estudiantes</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eaf0ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .contenedor {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 12px #aaa;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #6545c5;
+        }
+
+        input {
+            width: 95%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #bbb;
+            border-radius: 7px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #704bd1;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5030a5;
+        }
+
+        .carreras {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .carreras label {
+            background: #eee9ff;
+            padding: 12px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .carreras input {
+            width: auto;
+        }
+
+        li {
+            margin: 12px 0;
+            padding: 12px;
+            background: #f0edff;
+            border-radius: 8px;
+            list-style: none;
+        }
+
+        .eliminar {
+            background: #e34b65;
+            margin-top: 10px;
+        }
+
+        .eliminar:hover {
+            background: #bd2945;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <h1>Registro de estudiantes</h1>
+
+    <form id="formulario">
+
+        <input type="text" id="nombre"
+        placeholder="Nombre" required>
+
+        <input type="text" id="apellido"
+        placeholder="Apellidos" required>
+
+        <input type="number" id="edad"
+        placeholder="Edad" min="1" required>
+
+        <input type="text" id="matricula"
+        placeholder="Matrícula" required>
+
+        <h3>Selecciona tu carrera:</h3>
+
+        <div class="carreras">
+
+            <label>
+                <input type="radio" name="carrera"
+                value="Programación" required>
+                Programación
+            </label>
+
+            <label>
+                <input type="radio" name="carrera"
+                value="Deo">
+                Deo
+            </label>
+
+            <label>
+                <input type="radio" name="carrera"
+                value="Electrónica">
+                Electrónica
+            </label>
+
+        </div>
+
+        <input type="email" id="correo"
+        placeholder="Correo electrónico" required>
+
+        <button type="submit">
+            Registrar estudiante
+        </button>
+
+    </form>
+
+    <h2>Estudiantes registrados</h2>
+
+    <ul id="lista"></ul>
+
+</div>
+
+<script>
+
+const formulario = document.getElementById("formulario");
+const lista = document.getElementById("lista");
+
+let estudiantes = JSON.parse(
+    localStorage.getItem("estudiantes")
+) || [];
+
+function mostrarEstudiantes() {
+
+    lista.innerHTML = "";
+
+    if (estudiantes.length === 0) {
+        lista.innerHTML =
+        "<li>No hay estudiantes registrados.</li>";
+        return;
+    }
+
+    estudiantes.forEach(function(estudiante, indice) {
+
+        let elemento = document.createElement("li");
+
+        elemento.innerHTML = `
+            <strong>${estudiante.nombre} ${estudiante.apellido}</strong><br>
+            Edad: ${estudiante.edad}<br>
+            Matrícula: ${estudiante.matricula}<br>
+            Carrera: ${estudiante.carrera}<br>
+            Correo: ${estudiante.correo}
+        `;
+
+        let botonEliminar = document.createElement("button");
+
+        botonEliminar.textContent = "Eliminar estudiante";
+        botonEliminar.className = "eliminar";
+
+        botonEliminar.addEventListener("click", function() {
+            eliminarEstudiante(indice);
+        });
+
+        elemento.appendChild(botonEliminar);
+
+        lista.appendChild(elemento);
+
+    });
+}
+
+// REGISTRAR ESTUDIANTE
+
+formulario.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    let estudiante = {
+
+        nombre: document.getElementById("nombre").value,
+        apellido: document.getElementById("apellido").value,
+        edad: document.getElementById("edad").value,
+        matricula: document.getElementById("matricula").value,
+
+        carrera: document.querySelector(
+            'input[name="carrera"]:checked'
+        ).value,
+
+        correo: document.getElementById("correo").value
+
+    };
+
+    estudiantes.push(estudiante);
+
+    localStorage.setItem(
+        "estudiantes",
+        JSON.stringify(estudiantes)
+    );
+
+    mostrarEstudiantes();
+
+    formulario.reset();
+
+    alert("Estudiante registrado correctamente");
+
+});
+
+// ELIMINAR ESTUDIANTE
+
+function eliminarEstudiante(indice) {
+
+    if (confirm("¿Estás seguro de eliminar este estudiante?")) {
+
+        estudiantes.splice(indice, 1);
+
+        localStorage.setItem(
+            "estudiantes",
+            JSON.stringify(estudiantes)
+        );
+
+        mostrarEstudiantes();
+
+        alert("Estudiante eliminado correctamente");
+    }
+
+}
+
+mostrarEstudiantes();
+
+</script>
+
+</body>
+</html>
